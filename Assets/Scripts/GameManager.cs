@@ -18,7 +18,8 @@ public class GameManager : MonoBehaviour
         tileWidth = tiles[0].GetComponent<Renderer>().bounds.size.z;
         tileHeight = tiles[0].GetComponent<Renderer>().bounds.size.x;
         GenerateMap();
-
+        // Horizontal bounds can only be calculated after map generation
+        FindObjectOfType<MouseManager>().DetermineHorizontalBounds();
     }
 
     // Update is called once per frame
