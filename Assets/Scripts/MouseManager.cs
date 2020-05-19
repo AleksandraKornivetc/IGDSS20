@@ -96,7 +96,7 @@ public class MouseManager : MonoBehaviour
             lowerBoundZ = lowerBoundZ < tile.transform.position.z ? lowerBoundZ : tile.transform.position.z;
             upperBoundX = upperBoundX > tile.transform.position.x ? upperBoundX : tile.transform.position.x;
             upperBoundZ = upperBoundZ > tile.transform.position.z ? upperBoundZ : tile.transform.position.z;
-        }    
+        }
         CenterCamera();
     }
 
@@ -110,6 +110,6 @@ public class MouseManager : MonoBehaviour
     private void CenterCamera()
     {
         // Once the horizontal bounds are known, the camera can be placed in a way to display the entire map - otherwise, it would be at the top left corner.
-        cameraTransform.Translate(new Vector3(upperBoundZ/2, 0, upperBoundX/2),Space.World);
+        cameraTransform.Translate(new Vector3(upperBoundZ / 2, 0, upperBoundX / 2), Space.World);
     }
 }
