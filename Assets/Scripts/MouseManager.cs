@@ -82,7 +82,10 @@ public class MouseManager : MonoBehaviour
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit)) Debug.Log(hit.transform.name);
+            if (Physics.Raycast(ray, out hit))
+            {
+                Debug.Log(hit.transform.name);
+            }
         }
     }
 

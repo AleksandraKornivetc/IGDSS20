@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Removed inheritance from MonoBehaviour - if the class indeed only serves as a container. This facilitates instantiation.
-public class Tile
+public class Tile : MonoBehaviour
 {
     #region Attributes
     public TileTypes _type; //The type of the tile

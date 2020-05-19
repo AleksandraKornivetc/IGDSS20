@@ -170,7 +170,7 @@ public class GameManager : MonoBehaviour
         int w = t._coordinateWidth;
 
         // Neighbors differ depending on indentation of tile rows
-        int[] neighborIndexOffset_x = h % 2 == 0 ? new int[] { 0, 1, -1, 1, 0, 1 } : new int[] { -1, 0, -1, 1, -1, 0 };
+        int[] neighborIndexOffset_x = h % 2 == 1 ? new int[] { 0, 1, -1, 1, 0, 1 } : new int[] { -1, 0, -1, 1, -1, 0 };
         int[] neighborIndexOffset_y = { -1, -1, 0, 0, 1, 1 };
 
         for (int i = 0; i < 6; i++)
@@ -224,8 +224,7 @@ public class GameManager : MonoBehaviour
 
                 GameObject gameObjectTile = Instantiate(_tilePrefabs[tileIndex]) as GameObject;
                 gameObjectTile.transform.Translate(newTileTransform, Space.World);
-
-                Tile newTile = new Tile();
+                Tile newTile = gameObjectTile.AddComponent<Tile>();
 
                 switch (tileIndex)
                 {
