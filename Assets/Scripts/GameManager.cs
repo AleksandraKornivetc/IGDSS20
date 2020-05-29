@@ -170,6 +170,12 @@ public class GameManager : MonoBehaviour
         return _resourcesInWarehouse[resource] >= 1;
     }
 
+    // Add or subtracts a resource by a given amount from the warehouse.
+    public void ModifyWarehouseResource(GameManager.ResourceTypes resource, int amount)
+    {
+        _resourcesInWarehouse[resource] += amount;
+    }
+
     //Is called by MouseManager when a tile was clicked
     //Forwards the tile to the method for spawning buildings
     public void TileClicked(int height, int width)
@@ -185,27 +191,41 @@ public class GameManager : MonoBehaviour
         //if there is building prefab for the number input
         if (_selectedBuildingPrefabIndex < _buildingPrefabs.Length)
         {
+            Building selectedBuilding = _buildingPrefabs[_selectedBuildingPrefabIndex].GetComponent<Building>();
+            bool canBuild = false;
             // Check if building is allowed on tile
-            Tile.TileTypes[] allowedTiles = _buildingPrefabs[_selectedBuildingPrefabIndex].GetComponent<Building>()._possibleTiles;
+            Tile.TileTypes[] allowedTiles = selectedBuilding._possibleTiles;
             foreach (Tile.TileTypes tt in allowedTiles)
             {
                 if (tt.Equals(t._type))
                 {
-                    // Remove decorations from tile
-                    Transform[] ts = t.gameObject.GetComponentsInChildren<Transform>();
-                    foreach (Transform ct in ts)
-                    {
-                        // Exclude parent game object from the list returned by GetComponentsInChildren
-                        if (ct.gameObject.GetInstanceID() != t.gameObject.GetInstanceID()) Destroy(ct.gameObject);
-                    }
-
-                    // Instantiate and place new building
-                    GameObject buildingTile = Instantiate(_buildingPrefabs[_selectedBuildingPrefabIndex]) as GameObject;
-                    buildingTile.transform.Translate(t.transform.position, Space.World);
-
-                    // Break out of foreach
+                    canBuild = true;
                     break;
                 }
+            }
+            // Check if sufficient money and build resources are available
+            canBuild = canBuild
+                && _money >= selectedBuilding._constructionCostMoney
+                && _ResourcesInWarehouse_Planks >= selectedBuilding._constructionCostPlanks;
+
+            if (canBuild)
+            {
+                // Remove required money and resources
+                _money -= selectedBuilding._constructionCostMoney;
+                _ResourcesInWarehouse_Planks -= selectedBuilding._constructionCostPlanks;
+
+                // Remove decorations from tile
+                Transform[] ts = t.gameObject.GetComponentsInChildren<Transform>();
+                foreach (Transform ct in ts)
+                {
+                    // Exclude parent game object from the list returned by GetComponentsInChildren
+                    if (ct.gameObject.GetInstanceID() != t.gameObject.GetInstanceID()) Destroy(ct.gameObject);
+                }
+
+                // Instantiate and place new building
+                GameObject buildingTile = Instantiate(_buildingPrefabs[_selectedBuildingPrefabIndex]) as GameObject;
+                buildingTile.transform.Translate(t.transform.position, Space.World);
+                buildingTile.GetComponent<Building>()._tile = t;
             }
         }
     }
