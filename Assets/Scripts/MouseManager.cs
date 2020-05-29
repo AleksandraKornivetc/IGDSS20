@@ -84,7 +84,14 @@ public class MouseManager : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
             {
-                Debug.Log(hit.transform.name);
+                // Check if the hit was on a tile, not a building
+                Tile t = hit.transform.gameObject.GetComponent<Tile>();
+                if(t != null)
+                {
+                    int h = hit.transform.gameObject.GetComponent<Tile>()._coordinateHeight;
+                    int w = hit.transform.gameObject.GetComponent<Tile>()._coordinateWidth;
+                    FindObjectOfType<GameManager>().TileClicked(h, w);
+                }
             }
         }
     }

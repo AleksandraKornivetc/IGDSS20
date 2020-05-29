@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     public int _economyTickInterval = 60;
     float _timeSinceLastEconomyTick;
     #endregion
-    
+
     #region Resources
     private Dictionary<ResourceTypes, float> _resourcesInWarehouse = new Dictionary<ResourceTypes, float>(); //Holds a number of stored resources for every ResourceType
 
@@ -76,7 +76,7 @@ public class GameManager : MonoBehaviour
 
     void EconomyTick()
     {
-        if(Time.time > _timeSinceLastEconomyTick + _economyTickInterval)
+        if (Time.time > _timeSinceLastEconomyTick + _economyTickInterval)
         {
             _timeSinceLastEconomyTick = Time.time;
             // Add base income
@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour
     {
         Building[] _allBuildings = FindObjectsOfType<Building>();
         int result = 0;
-        foreach(Building b in _allBuildings) result += b._upkeep;
+        foreach (Building b in _allBuildings) result += b._upkeep;
         return result;
     }
 
@@ -185,8 +185,28 @@ public class GameManager : MonoBehaviour
         //if there is building prefab for the number input
         if (_selectedBuildingPrefabIndex < _buildingPrefabs.Length)
         {
-            //TODO: check if building can be placed and then istantiate it
+            // Check if building is allowed on tile
+            Tile.TileTypes[] allowedTiles = _buildingPrefabs[_selectedBuildingPrefabIndex].GetComponent<Building>()._possibleTiles;
+            foreach (Tile.TileTypes tt in allowedTiles)
+            {
+                if (tt.Equals(t._type))
+                {
+                    // Remove decorations from tile
+                    Transform[] ts = t.gameObject.GetComponentsInChildren<Transform>();
+                    foreach (Transform ct in ts)
+                    {
+                        // Exclude parent game object from the list returned by GetComponentsInChildren
+                        if (ct.gameObject.GetInstanceID() != t.gameObject.GetInstanceID()) Destroy(ct.gameObject);
+                    }
 
+                    // Instantiate and place new building
+                    GameObject buildingTile = Instantiate(_buildingPrefabs[_selectedBuildingPrefabIndex]) as GameObject;
+                    buildingTile.transform.Translate(t.transform.position, Space.World);
+
+                    // Break out of foreach
+                    break;
+                }
+            }
         }
     }
 
