@@ -24,8 +24,8 @@ MonoBehaviour:
   _scalingNeighborTile: 0
   _minScalingNeighborTiles: 0
   _maxScalingNeighborTiles: 0
-  _inputResources: 
-  _outputResource: 6
+  _inputResources: 06000000
+  _outputResource: 7
 --- !u!1001 &720290174285462654
 PrefabInstance:
   m_ObjectHideFlags: 0
