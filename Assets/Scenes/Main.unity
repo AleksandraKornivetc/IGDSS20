@@ -473,12 +473,6 @@ MonoBehaviour:
   terrainExtremity: 15
   _buildingPrefabs:
   - {fileID: 3331960066271536643, guid: d53ebf9c867673a48a7f3868a0b9a888, type: 3}
-  - {fileID: 3331960066271536643, guid: da27b340d14073d47b7307773f6a13fa, type: 3}
-  - {fileID: 3331960066271536643, guid: e6222e560b8d8204c895a66b1c3dd964, type: 3}
-  - {fileID: 3331960066271536643, guid: 009944f1cdbcf924c88ae69e7a6f79ec, type: 3}
-  - {fileID: 3331960066271536643, guid: f7e46256301a00340892d047dec94b12, type: 3}
-  - {fileID: 3331960066271536643, guid: 6b191a3924648d74c836d429a9858d27, type: 3}
-  - {fileID: 3331960066271536643, guid: 8b2bf89644687dd49907ac2879776380, type: 3}
   _selectedBuildingPrefabIndex: 0
   _money: 0
   _baseIncome: 100
