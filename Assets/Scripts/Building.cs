@@ -46,6 +46,7 @@ public class Building : MonoBehaviour
                 _maxScalingNeighborTiles == 0
                 ? 1 : numRelevantNeighbors >= _minScalingNeighborTiles
                 ? (float)Mathf.Min(numRelevantNeighbors, _maxScalingNeighborTiles) / (float)_maxScalingNeighborTiles : 0;
+            Debug.Log(_efficiencyValue);
             // Check if there is at least one of each required input resource in the warehouse
             bool inputResourceAvailable = true;
             foreach (GameManager.ResourceTypes rt in _inputResources)
