@@ -471,12 +471,9 @@ MonoBehaviour:
   - {fileID: 6461190606886679958, guid: ff7ef13f88a71c94eb42898019398dcd, type: 3}
   - {fileID: 2064574628029001573, guid: 2a914b6a4ef15cb4ca77257050f15f29, type: 3}
   terrainExtremity: 15
-  _buildingPrefabs:
-  - {fileID: 3331960066271536643, guid: d53ebf9c867673a48a7f3868a0b9a888, type: 3}
+  _buildingPrefabs: []
   _selectedBuildingPrefabIndex: 0
-  _money: 0
   _baseIncome: 100
-  _economyTickInterval: 60
   _ResourcesInWarehouse_Fish: 0
   _ResourcesInWarehouse_Wood: 0
   _ResourcesInWarehouse_Planks: 0
