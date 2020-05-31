@@ -473,7 +473,6 @@ MonoBehaviour:
   terrainExtremity: 15
   _buildingPrefabs: []
   _selectedBuildingPrefabIndex: 0
-  _baseIncome: 100
   _ResourcesInWarehouse_Fish: 0
   _ResourcesInWarehouse_Wood: 0
   _ResourcesInWarehouse_Planks: 0

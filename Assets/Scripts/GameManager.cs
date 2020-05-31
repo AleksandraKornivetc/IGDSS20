@@ -19,13 +19,6 @@ public class GameManager : MonoBehaviour
     public int _selectedBuildingPrefabIndex = 0; //The current index used for choosing a prefab to spawn from the _buildingPrefabs list
     #endregion
 
-    #region Ecomomy
-    public int _money = 0; // Public, so that a starting income can be set
-    public int _baseIncome = 100;
-    public int _economyTickInterval = 60;
-    float _timeSinceLastEconomyTick;
-    #endregion
-    
     #region Resources
     private Dictionary<ResourceTypes, float> _resourcesInWarehouse = new Dictionary<ResourceTypes, float>(); //Holds a number of stored resources for every ResourceType
 
@@ -66,34 +59,12 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        EconomyTick();
         HandleKeyboardInput();
         UpdateInspectorNumbersForResources();
     }
     #endregion
 
     #region Methods
-
-    void EconomyTick()
-    {
-        if(Time.time > _timeSinceLastEconomyTick + _economyTickInterval)
-        {
-            _timeSinceLastEconomyTick = Time.time;
-            // Add base income
-            _money += _baseIncome;
-            // Subtract building upkeep
-            _money -= CalculateTotalBuildingUpkeep();
-        }
-    }
-
-    int CalculateTotalBuildingUpkeep()
-    {
-        Building[] _allBuildings = FindObjectsOfType<Building>();
-        int result = 0;
-        foreach(Building b in _allBuildings) result += b._upkeep;
-        return result;
-    }
-
     //Makes the resource dictionary usable by populating the values and keys
     void PopulateResourceDictionary()
     {
