@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -86,12 +87,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Adds and returns total upkeep
     int CalculateTotalBuildingUpkeep()
     {
-        Building[] _allBuildings = FindObjectsOfType<Building>();
-        int result = 0;
-        foreach (Building b in _allBuildings) result += b._upkeep;
-        return result;
+        return FindObjectsOfType<Building>().ToList().Aggregate(0, (a, b) => b._upkeep);
     }
 
     //Makes the resource dictionary usable by populating the values and keys
@@ -192,17 +191,10 @@ public class GameManager : MonoBehaviour
         if (_selectedBuildingPrefabIndex < _buildingPrefabs.Length)
         {
             Building selectedBuilding = _buildingPrefabs[_selectedBuildingPrefabIndex].GetComponent<Building>();
-            bool canBuild = false;
+            
             // Check if building is allowed on tile
             Tile.TileTypes[] allowedTiles = selectedBuilding._possibleTiles;
-            foreach (Tile.TileTypes tt in allowedTiles)
-            {
-                if (tt.Equals(t._type))
-                {
-                    canBuild = true;
-                    break;
-                }
-            }
+            bool canBuild = allowedTiles.ToList().Any(tt => tt.Equals(t._type));
             // Check if sufficient money and build resources are available
             canBuild = canBuild
                 && _money >= selectedBuilding._constructionCostMoney
@@ -216,11 +208,10 @@ public class GameManager : MonoBehaviour
 
                 // Remove decorations from tile
                 Transform[] ts = t.gameObject.GetComponentsInChildren<Transform>();
-                foreach (Transform ct in ts)
-                {
-                    // Exclude parent game object from the list returned by GetComponentsInChildren
-                    if (ct.gameObject.GetInstanceID() != t.gameObject.GetInstanceID()) Destroy(ct.gameObject);
-                }
+                // Exclude parent game object from the list returned by GetComponentsInChildren
+                // Then remove decorations
+                ts.ToList().FindAll(ct => ct.gameObject.GetInstanceID() != t.gameObject.GetInstanceID())
+                    .ForEach(currentTransform => Destroy(currentTransform.gameObject));
 
                 // Instantiate and place new building
                 GameObject buildingTile = Instantiate(_buildingPrefabs[_selectedBuildingPrefabIndex]) as GameObject;

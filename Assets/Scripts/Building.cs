@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Building : MonoBehaviour
 {
@@ -47,15 +48,10 @@ public class Building : MonoBehaviour
                 ? 1 : numRelevantNeighbors >= _minScalingNeighborTiles
                 ? (float)Mathf.Min(numRelevantNeighbors, _maxScalingNeighborTiles) / (float)_maxScalingNeighborTiles : 0;
             // Check if there is at least one of each required input resource in the warehouse
-            bool inputResourceAvailable = true;
-            foreach (GameManager.ResourceTypes rt in _inputResources)
-            {
-                if (!FindObjectOfType<GameManager>().HasResourceInWarehoues(rt))
-                {
-                    inputResourceAvailable = false;
-                    break;
-                }
-            }
+            bool inputResourceAvailable = _inputResources.ToList().All(rt => FindObjectOfType<GameManager>().HasResourceInWarehoues(rt));
+
+            // Every second, the efficency value is increased by a value between 0 and 1.
+            // Once the building-specific generation interval has been reached, a resource is produced and the efficency value is reset.
             // Check if the generation interval has been reached
             if (_efficiencyValue > _generationInterval && inputResourceAvailable)
             {

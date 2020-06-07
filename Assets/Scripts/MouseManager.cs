@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class MouseManager : MonoBehaviour
 {
@@ -99,14 +100,12 @@ public class MouseManager : MonoBehaviour
     public void DetermineHorizontalBounds()
     {
         // The horizontal bounds are determined by the tiles closest to the edge of the map
-        GameObject[] allTiles = GameObject.FindGameObjectsWithTag("Tile");
-        foreach (GameObject tile in allTiles)
-        {
-            lowerBoundX = lowerBoundX < tile.transform.position.x ? lowerBoundX : tile.transform.position.x;
-            lowerBoundZ = lowerBoundZ < tile.transform.position.z ? lowerBoundZ : tile.transform.position.z;
-            upperBoundX = upperBoundX > tile.transform.position.x ? upperBoundX : tile.transform.position.x;
-            upperBoundZ = upperBoundZ > tile.transform.position.z ? upperBoundZ : tile.transform.position.z;
-        }
+        List<GameObject> allTiles = GameObject.FindGameObjectsWithTag("Tile").ToList();
+        upperBoundX = allTiles.Max(t => t.transform.position.x);
+        upperBoundZ = allTiles.Max(t => t.transform.position.z);
+        lowerBoundX = allTiles.Min(t => t.transform.position.x);
+        lowerBoundZ = allTiles.Min(t => t.transform.position.z);
+        
         CenterCamera();
     }
 
