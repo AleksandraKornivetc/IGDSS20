@@ -13,7 +13,7 @@ public class Tile : MonoBehaviour
     #endregion
 
     #region Enumerations
-    public enum TileTypes { Empty=0, Water=1, Sand=2, Grass=3, Forest=4, Stone=5, Mountain=6 }; //Enumeration of all available tile types. Can be addressed from other scripts by calling Tile.Tiletypes
+    public enum TileTypes { Empty=1, Water=2, Sand=3, Grass=4, Forest=5, Stone=6, Mountain=7 }; //Enumeration of all available tile types. Can be addressed from other scripts by calling Tile.Tiletypes
     #endregion
 
     //This class acts as a data container and has no functionality

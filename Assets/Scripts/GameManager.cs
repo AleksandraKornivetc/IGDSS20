@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,7 +23,10 @@ public class GameManager : MonoBehaviour
     public int _selectedBuildingPrefabIndex = 0; //The current index used for choosing a prefab to spawn from the _buildingPrefabs list
     #endregion
 
-
+    public int _EconomyTicks = 60;
+    public float _MoneyConst = 100.0f;
+    public float _MoneyPool = 0.0f;
+    float seconds = 0.0f;
     #region Resources
     private Dictionary<ResourceTypes, float> _resourcesInWarehouse = new Dictionary<ResourceTypes, float>(); //Holds a number of stored resources for every ResourceType
 
@@ -66,11 +71,26 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        EconomyTick();
         HandleKeyboardInput();
         UpdateInspectorNumbersForResources();
     }
     #endregion
-
+    // Every 60 seconds the economy should tick, managed by the GameManager.
+    // Subtract the sum of all building's upkeep cost from the money pool.
+    // Also, add a constant income of 100 money per economy tick.
+    void EconomyTick()
+    {
+        seconds += Time.deltaTime;
+        if(seconds == _EconomyTicks)
+        {
+            var buildingCosts = 0.0f;
+            Array.ForEach<Building>(FindObjectsOfType<Building>(), s => buildingCosts += s._Upkeep);
+            _MoneyPool = _MoneyPool + _MoneyConst - buildingCosts;
+            seconds = 0.0f;
+        }
+        
+    }
     #region Methods
     //Makes the resource dictionary usable by populating the values and keys
     void PopulateResourceDictionary()
@@ -83,6 +103,10 @@ public class GameManager : MonoBehaviour
         _resourcesInWarehouse.Add(ResourceTypes.Clothes, 0);
         _resourcesInWarehouse.Add(ResourceTypes.Potato, 0);
         _resourcesInWarehouse.Add(ResourceTypes.Schnapps, 0);
+    }
+    public void AddNewRes(ResourceTypes resource, int outputCount)
+    {
+        _resourcesInWarehouse.Add(resource, outputCount);
     }
 
     //Sets the index for the currently selected building prefab by checking key presses on the numbers 1 to 0
@@ -157,16 +181,27 @@ public class GameManager : MonoBehaviour
         PlaceBuildingOnTile(t);
     }
 
-    //Checks if the currently selected building type can be placed on the given tile and then instantiates an instance of the prefab
+    // Checks if the currently selected building type can be placed on the given tile and then instantiates an instance of the prefab
+    // Check if a compatible type of tile was clicked for placement, and if the required materials and money are available.
+    // Then subtract accordingly and instantiate the building.
     private void PlaceBuildingOnTile(Tile t)
     {
         //if there is building prefab for the number input
         if (_selectedBuildingPrefabIndex < _buildingPrefabs.Length)
         {
-            //TODO: check if building can be placed and then istantiate it
-
+            var prefab = _buildingPrefabs[_selectedBuildingPrefabIndex].GetComponent<Building>();
+            if (prefab._CanBuiltOnTileTypes.FirstOrDefault(el => el == t._type) != 0 && prefab._BuildCostMoney <= _MoneyPool && prefab._BuildCostPlanks <= _ResourcesInWarehouse_Planks)
+            {
+                var tile = Instantiate(_buildingPrefabs[_selectedBuildingPrefabIndex]) as GameObject;
+                tile.transform.Translate(t.transform.position, Space.World);
+                tile.GetComponent<Building>()._Tile = t;
+                _MoneyPool -= prefab._BuildCostMoney;
+                _ResourcesInWarehouse_Planks -= prefab._BuildCostPlanks;
+            }
         }
     }
+    //Create a prefab for each of the following production building and decorate it with models.
+    // Hint: the easiest way for layouting the building is to drag a tile prefab into the building prefab for size and positional reference, place the model elements and deleting the tile prefab afterwards.
 
     //Returns a list of all neighbors of a given tile
     private List<Tile> FindNeighborsOfTile(Tile t)
@@ -233,7 +268,7 @@ public class GameManager : MonoBehaviour
                 Tile tile = new Tile();
                 tile._coordinateHeight = i;
                 tile._coordinateWidth = j;
-                tile._type = (Tile.TileTypes)tileIndex;
+                tile._type = (Tile.TileTypes)tileIndex+1;
                 _tileMap[j, i] = tile;
             }
         }
