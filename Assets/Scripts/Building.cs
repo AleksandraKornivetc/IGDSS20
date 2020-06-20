@@ -3,69 +3,59 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Building : MonoBehaviour
+
+public abstract class Building : MonoBehaviour
 {
-    #region Attributes
     public string _name;
-    public BuildingType _buildingType;
-    public int _upkeep;
     public int _constructionCostMoney;
     public int _constructionCostPlanks;
     public Tile _tile;
-
-    float _efficiencyValue; // Calculated, so not public
-    float _nextGenerationTick;
-
-    public int _generationInterval;
-    public int _outputCount;
     public Tile.TileTypes[] _possibleTiles;
-    public Tile.TileTypes _scalingNeighborTile; // Does not scale if null
-    [Range(0, 6)]
-    public int _minScalingNeighborTiles;
-    [Range(0, 6)]
-    public int _maxScalingNeighborTiles;
-    public GameManager.ResourceTypes[] _inputResources;
-    public GameManager.ResourceTypes _outputResource;
+
+
+    #region Manager References
+    protected GameManager _gameManager;
+    JobManager _jobManager; //Reference to the JobManager
+    #endregion
+    
+    #region Workers
+    public List<Worker> _workers; //List of all workers associated with this building, either for work or living
     #endregion
 
-    private void Start()
-    {
-        _nextGenerationTick = Time.time;
-    }
-
-    private void Update()
-    {
-        // Update every second
-        if (Time.time > _nextGenerationTick)
-        {
-            _nextGenerationTick++;
-            // Count relevant neighbor tiles. Developed tiles _do_ count towards this.
-            int numRelevantNeighbors = _tile._neighborTiles.FindAll(t => t._type == _scalingNeighborTile).Count;
-            // If the number of relevant neighbor tiles match or exceed the minimum, add the proportial progress to the efficiency value
-            // On the other hand, if the maximum number of relevant neighbor tiles is 0, just add 1 to the efficency value
-            _efficiencyValue +=
-                _maxScalingNeighborTiles == 0
-                ? 1 : numRelevantNeighbors >= _minScalingNeighborTiles
-                ? (float)Mathf.Min(numRelevantNeighbors, _maxScalingNeighborTiles) / (float)_maxScalingNeighborTiles : 0;
-            // Check if there is at least one of each required input resource in the warehouse
-            bool inputResourceAvailable = _inputResources.ToList().All(rt => FindObjectOfType<GameManager>().HasResourceInWarehoues(rt));
-
-            // Every second, the efficency value is increased by a value between 0 and 1.
-            // Once the building-specific generation interval has been reached, a resource is produced and the efficency value is reset.
-            // Check if the generation interval has been reached
-            if (_efficiencyValue > _generationInterval && inputResourceAvailable)
-            {
-                // Set back the efficiency value with each generation
-                _efficiencyValue -= _generationInterval;
-                FindObjectOfType<GameManager>().ModifyWarehouseResource(_outputResource, _outputCount);
-
-            }
-        }
-    }
-
-
-    #region Enumerations
-    public enum BuildingType { Empty, Fishery, Lumberjack, Sawmill, SheepFarm, FrameworkKnitters, PotatoFarm, SchnappsDistillery };
+    #region Jobs
+    public List<Job> _jobs; // List of all available Jobs. Is populated in Start()
     #endregion
 
+
+    #region Methods   
+
+    // Start is called before the first frame update
+    protected virtual void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    protected virtual void Update()
+    {
+        if (_gameManager == null) _gameManager = FindObjectOfType<GameManager>();
+    }
+
+    public void WorkerAssignedToBuilding(Worker w)
+    {
+        _workers.Add(w);
+    }
+
+    public void WorkerRemovedFromBuilding(Worker w)
+    {
+        _workers.Remove(w);
+    }
+
+    // Efficiency is defined as the average happiness of all inhabitants
+    protected float GetAverageHappiness()
+    {
+        return _workers.Count == 0 ? 0 : _workers.ToList().Where(w => w !=null).Select(w => w._happiness).DefaultIfEmpty(0f).Average();
+    }
+
+    #endregion
 }

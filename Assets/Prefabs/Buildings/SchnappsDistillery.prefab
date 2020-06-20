@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb7a8eac86575d74581beae41c255a01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _workers: []
   _name: Schnapps Distillery
   _buildingType: 7
   _upkeep: 40
   _constructionCostMoney: 100
   _constructionCostPlanks: 2
+  _jobCount: 50
   _tile: {fileID: 0}
   _generationInterval: 30
   _outputCount: 1

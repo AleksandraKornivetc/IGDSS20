@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
     public int _money = 0; // Public, so that a starting income can be set
     public int _baseIncome = 100;
     public int _economyTickInterval = 60;
+    public int _incomePerWorker = 10;
+    public int _incomePerNonWorker = 5;
     float _timeSinceLastEconomyTick;
     #endregion
 
@@ -80,17 +82,20 @@ public class GameManager : MonoBehaviour
         if (Time.time > _timeSinceLastEconomyTick + _economyTickInterval)
         {
             _timeSinceLastEconomyTick = Time.time;
-            // Add base income
-            _money += _baseIncome;
-            // Subtract building upkeep
-            _money -= CalculateTotalBuildingUpkeep();
+            // Add income based on workers and non-workers
+            int _workerIncome = 0;
+            WorkerPooler.instance.GetActiveWorkers().ToList().ForEach(w =>
+                _workerIncome += w._age < w._retirementAge && w._age > w._adultAge ? _incomePerWorker : _incomePerNonWorker
+            );
+
+            _money += _baseIncome + _workerIncome - CalculateTotalBuildingUpkeep();
         }
     }
 
     // Adds and returns total upkeep
     int CalculateTotalBuildingUpkeep()
     {
-        return FindObjectsOfType<Building>().ToList().Aggregate(0, (a, b) => b._upkeep);
+        return FindObjectsOfType<ProductionBuilding>().ToList().Aggregate(0, (a, b) => b._upkeep);
     }
 
     //Makes the resource dictionary usable by populating the values and keys
@@ -191,14 +196,14 @@ public class GameManager : MonoBehaviour
         if (_selectedBuildingPrefabIndex < _buildingPrefabs.Length)
         {
             Building selectedBuilding = _buildingPrefabs[_selectedBuildingPrefabIndex].GetComponent<Building>();
-            
-            // Check if building is allowed on tile
-            Tile.TileTypes[] allowedTiles = selectedBuilding._possibleTiles;
-            bool canBuild = allowedTiles.ToList().Any(tt => tt.Equals(t._type));
+
+            // Check if building is allowed on tile and tile is empty
+            Tile.TileTypes[] allowedTiles =  selectedBuilding._possibleTiles;
+            bool canBuild = t._building == null && allowedTiles.ToList().Any(tt => tt.Equals(t._type));
             // Check if sufficient money and build resources are available
             canBuild = canBuild
                 && _money >= selectedBuilding._constructionCostMoney
-                && _ResourcesInWarehouse_Planks >= selectedBuilding._constructionCostPlanks;
+                && _ResourcesInWarehouse_Planks >= selectedBuilding._constructionCostPlanks;;
 
             if (canBuild)
             {
@@ -215,8 +220,12 @@ public class GameManager : MonoBehaviour
 
                 // Instantiate and place new building
                 GameObject buildingTile = Instantiate(_buildingPrefabs[_selectedBuildingPrefabIndex]) as GameObject;
+                buildingTile.transform.parent = GameObject.Find("BuildingsContainer").transform;
                 buildingTile.transform.Translate(t.transform.position, Space.World);
-                buildingTile.GetComponent<Building>()._tile = t;
+                Building b = buildingTile.GetComponent<Building>();
+                b._tile = t;
+                t._building = b;
+
             }
         }
     }
@@ -283,6 +292,7 @@ public class GameManager : MonoBehaviour
                     j * tileWidth + (i % 2 * tileWidth / 2));
 
                 GameObject gameObjectTile = Instantiate(_tilePrefabs[tileIndex]) as GameObject;
+                gameObjectTile.transform.parent = GameObject.Find("TilesContainer").transform;
                 gameObjectTile.transform.Translate(newTileTransform, Space.World);
                 Tile newTile = gameObjectTile.AddComponent<Tile>();
 

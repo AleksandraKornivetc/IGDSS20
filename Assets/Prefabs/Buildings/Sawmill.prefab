@@ -13,14 +13,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _name: Sawmill
-  _buildingType: 3
-  _upkeep: 10
   _constructionCostMoney: 100
   _constructionCostPlanks: 0
   _tile: {fileID: 0}
+  _possibleTiles: 030000000400000005000000
+  _workers: []
+  _buildingType: 3
+  _upkeep: 10
+  _jobCount: 10
   _generationInterval: 15
   _outputCount: 2
-  _possibleTiles: 030000000400000005000000
   _scalingNeighborTile: 0
   _minScalingNeighborTiles: 0
   _maxScalingNeighborTiles: 0

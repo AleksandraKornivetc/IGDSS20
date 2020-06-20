@@ -13,14 +13,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _name: Lumberjack
-  _buildingType: 2
-  _upkeep: 10
   _constructionCostMoney: 100
   _constructionCostPlanks: 0
   _tile: {fileID: 0}
+  _possibleTiles: 04000000
+  _workers: []
+  _buildingType: 2
+  _upkeep: 10
+  _jobCount: 5
   _generationInterval: 15
   _outputCount: 1
-  _possibleTiles: 04000000
   _scalingNeighborTile: 4
   _minScalingNeighborTiles: 1
   _maxScalingNeighborTiles: 6
