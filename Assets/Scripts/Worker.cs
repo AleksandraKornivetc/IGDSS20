@@ -13,7 +13,7 @@ public class Worker : MonoBehaviour
 
     [Range(0, 100)]
     public float _age; // The age of this worker
-    [Range(0,100)]
+    [Range(0, 100)]
     public float _happiness; // The happiness of this worker
 
     public int _consumptionInterval; // Seconds between metabolism ticks
@@ -79,6 +79,7 @@ public class Worker : MonoBehaviour
                 if (inputResourceAvailable)
                 {
                     _happiness++;
+                    Mathf.Clamp(_happiness, 0, 100);
                     FindObjectOfType<GameManager>().ModifyWarehouseResource(entry.Key, -1);
                     _needForConsumables[entry.Key] = 0;
                 }
@@ -86,6 +87,7 @@ public class Worker : MonoBehaviour
                 else
                 {
                     _happiness--;
+                    Mathf.Clamp(_happiness, 0, 100);
                 }
             }
             // Increase need if limit is not yet reached
