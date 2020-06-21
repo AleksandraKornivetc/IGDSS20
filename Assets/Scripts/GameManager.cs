@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     #region Buildings
     public GameObject[] _buildingPrefabs; //References to the building prefabs
     public int _selectedBuildingPrefabIndex = 0; //The current index used for choosing a prefab to spawn from the _buildingPrefabs list
+    public List<Building> _allBuildings;
     #endregion
 
     #region Ecomomy
@@ -84,6 +85,7 @@ public class GameManager : MonoBehaviour
             _money += _baseIncome;
             // Subtract building upkeep
             _money -= CalculateTotalBuildingUpkeep();
+            _money += CalculateBuildingProfit();
         }
     }
 
@@ -91,6 +93,12 @@ public class GameManager : MonoBehaviour
     int CalculateTotalBuildingUpkeep()
     {
         return FindObjectsOfType<Building>().ToList().Aggregate(0, (a, b) => b._upkeep);
+    }
+    //Extend the GameManager's money generation logic to take the number of living workers into account.
+    //A simple fixed amount per worker is sufficient. Optionally, you can consider retirees and children differently from employed and unemployed workers.
+    int CalculateBuildingProfit()
+    {
+        return FindObjectsOfType<Building>().ToList().Select(s => s._workers.Count * s._workers.FirstOrDefault()._fixWorkerCost).Sum();
     }
 
     //Makes the resource dictionary usable by populating the values and keys

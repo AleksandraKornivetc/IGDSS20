@@ -3,69 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Building : MonoBehaviour
+public abstract class Building : MonoBehaviour
 {
-    #region Attributes
-    public string _name;
-    public BuildingType _buildingType;
+    #region Manager References
+    JobManager _jobManager; //Reference to the JobManager
+    GameManager _gameManager;
+    #endregion
+    
+    #region Workers
+    public List<Worker> _workers; //List of all workers associated with this building, either for work or living
+    #endregion
+
+    #region Jobs
+    public List<Job> _jobs; // List of all available Jobs. Is populated in Start()
+    #endregion
+
     public int _upkeep;
     public int _constructionCostMoney;
     public int _constructionCostPlanks;
+    public float _nextGenerationTick;
     public Tile _tile;
-
-    float _efficiencyValue; // Calculated, so not public
-    float _nextGenerationTick;
-
-    public int _generationInterval;
-    public int _outputCount;
     public Tile.TileTypes[] _possibleTiles;
-    public Tile.TileTypes _scalingNeighborTile; // Does not scale if null
-    [Range(0, 6)]
-    public int _minScalingNeighborTiles;
-    [Range(0, 6)]
-    public int _maxScalingNeighborTiles;
-    public GameManager.ResourceTypes[] _inputResources;
-    public GameManager.ResourceTypes _outputResource;
-    #endregion
+    public int _generationInterval;
+    public float _efficiencyValue; // Calculated, so not public
 
-    private void Start()
+    public void Start()
     {
         _nextGenerationTick = Time.time;
+        _gameManager._allBuildings.Add(this);
     }
 
-    private void Update()
+    #region Methods   
+    public void WorkerAssignedToBuilding(Worker w)
     {
-        // Update every second
-        if (Time.time > _nextGenerationTick)
-        {
-            _nextGenerationTick++;
-            // Count relevant neighbor tiles. Developed tiles _do_ count towards this.
-            int numRelevantNeighbors = _tile._neighborTiles.FindAll(t => t._type == _scalingNeighborTile).Count;
-            // If the number of relevant neighbor tiles match or exceed the minimum, add the proportial progress to the efficiency value
-            // On the other hand, if the maximum number of relevant neighbor tiles is 0, just add 1 to the efficency value
-            _efficiencyValue +=
-                _maxScalingNeighborTiles == 0
-                ? 1 : numRelevantNeighbors >= _minScalingNeighborTiles
-                ? (float)Mathf.Min(numRelevantNeighbors, _maxScalingNeighborTiles) / (float)_maxScalingNeighborTiles : 0;
-            // Check if there is at least one of each required input resource in the warehouse
-            bool inputResourceAvailable = _inputResources.ToList().All(rt => FindObjectOfType<GameManager>().HasResourceInWarehoues(rt));
-
-            // Every second, the efficency value is increased by a value between 0 and 1.
-            // Once the building-specific generation interval has been reached, a resource is produced and the efficency value is reset.
-            // Check if the generation interval has been reached
-            if (_efficiencyValue > _generationInterval && inputResourceAvailable)
-            {
-                // Set back the efficiency value with each generation
-                _efficiencyValue -= _generationInterval;
-                FindObjectOfType<GameManager>().ModifyWarehouseResource(_outputResource, _outputCount);
-
-            }
-        }
+        _workers.Add(w);
     }
 
-
-    #region Enumerations
-    public enum BuildingType { Empty, Fishery, Lumberjack, Sawmill, SheepFarm, FrameworkKnitters, PotatoFarm, SchnappsDistillery };
+    public void WorkerRemovedFromBuilding(Worker w)
+    {
+        _workers.Remove(w);
+    }
+    public float CalculateEfficiency()
+    {
+        // calculate _efficiencyValue
+        return _workers.Select(s => s._happiness).ToList().Average();
+    }
+    public float CalculateJobEfficiency()
+    {
+        //The efficiency of a production building depends on the number of jobs it provides and how many of those are currently occupied.
+        return _jobManager._availableJobs.Where(a => a._building == this).ToList().Count / _jobs.Count;
+    }
     #endregion
-
 }
