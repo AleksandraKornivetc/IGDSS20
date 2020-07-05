@@ -17,11 +17,13 @@ public class Job
     {
         _worker = w;
         _building.WorkerAssignedToBuilding(w);
+        w._workplace = (ProductionBuilding) _building;
     }
 
     public void RemoveWorker(Worker w)
     {
         _worker = null;
         _building.WorkerRemovedFromBuilding(w);
+        w._workplace = null;
     }
 }

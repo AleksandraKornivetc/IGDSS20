@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Texture2D heightmap;
+    public Tile[,] map;
 
     #region Map generation
     public GameObject[] _tilePrefabs; // Array of all available tile prefabs
@@ -226,6 +227,9 @@ public class GameManager : MonoBehaviour
                 b._tile = t;
                 t._building = b;
 
+                // Generate potential field for new building
+                b.SetPotentialField(FindObjectOfType<NavigationManager>().GeneratePotentialField(map, b));
+
             }
         }
     }
@@ -333,6 +337,8 @@ public class GameManager : MonoBehaviour
                 _tileMap[i, j]._neighborTiles = FindNeighborsOfTile(_tileMap[i, j]);
             }
         }
+
+        map = _tileMap;
     }
     #endregion
 

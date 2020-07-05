@@ -19,7 +19,10 @@ public class HousingBuilding : Building
         // The workers start as adults
         for (int i = 0; i < 2; i++)
         {
-            _workers.Add(WorkerPooler.instance.GetWorker(16));
+            Worker newWorker = WorkerPooler.instance.GetWorker(16);
+            _workers.Add(newWorker);
+            newWorker._home = this;
+            newWorker.transform.position = this.transform.position;
         }
     }
 
@@ -35,7 +38,9 @@ public class HousingBuilding : Building
         if(Time.time > _nextChildSpawnTick)
         {
             _nextChildSpawnTick += _childSpawnInterval;
-            if(GetAverageHappiness() >= 100 && _workers.Count < 10) _workers.Add(WorkerPooler.instance.GetWorker(0));
+            Worker _newWorker = WorkerPooler.instance.GetWorker(0);
+            _newWorker._home = this;
+            if (GetAverageHappiness() >= 100 && _workers.Count < 10) _workers.Add(_newWorker);
         }
 
     }

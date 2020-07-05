@@ -11,6 +11,7 @@ public abstract class Building : MonoBehaviour
     public int _constructionCostPlanks;
     public Tile _tile;
     public Tile.TileTypes[] _possibleTiles;
+    private int[,] _potentialField;
 
 
     #region Manager References
@@ -55,6 +56,17 @@ public abstract class Building : MonoBehaviour
     protected float GetAverageHappiness()
     {
         return _workers.Count == 0 ? 0 : _workers.ToList().Where(w => w !=null).Select(w => w._happiness).DefaultIfEmpty(0f).Average();
+    }
+
+    public void SetPotentialField(int[,] pf)
+    {
+        _potentialField = pf;
+    }
+
+
+    public int[,] GetPotentialField()
+    {
+        return _potentialField;
     }
 
     #endregion
